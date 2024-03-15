@@ -36,4 +36,4 @@ For more information, please see [Zabbix](https://www.zabbix.com/documentation/6
 <br/><br/>
 ## Supported Versions
 
-Zabbix 6.2
+Zabbix 6.2+
