@@ -23,6 +23,10 @@ The configuration consists of a _media type_ in Zabbix, which will invoke the we
 The following parameters are required:<br>
 **access_token** - API access token created in SMSEagle<br>
 **url** - actual URL of your SMSEagle device (for example: http://10.10.0.100 or https://sms.mycompany.com)<br>
+**type** - type(s) of message(s) to send. Possible values: **sms, mms, tts** and **tts_adv**, respectively for SMS, MMS, TTS Call and Advanced TTS Call.<br/>
+Allows multiple types, separated by commas (e.g. "sms,tts_adv").
+
+Other required parameters are message type specific. More information can be found on our [APIv2](https://www.smseagle.eu/docs/apiv2/) page.
 
 
 3\. in the **Administration > Users** click on a User, and add a new media called **SMSEagle**. Enter SMS recipient. Available recipient formats:<br>

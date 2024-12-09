@@ -2,7 +2,7 @@ zabbix_export:
   version: '6.0'
   media_types:
     -
-      name: SMSEagle
+      name: SMSEagle v2
       type: WEBHOOK
       parameters:
         -
@@ -15,10 +15,10 @@ zabbix_export:
           name: recipient
           value: '{ALERT.SENDTO}'
         -
-          name: message
+          name: text
           value: '{ALERT.MESSAGE}'
         -
-          name: highpriority
+          name: priority
           value: '0'
         -
           name: modem_no
@@ -27,32 +27,39 @@ zabbix_export:
           name: oid
           value: 'default'
         -
-          name: unicode
-          value: '0'
+          name: encoding
+          value: 'default'
         -
           name: date
           value: 'YYYYmmDDHHMM'
         -
           name: send_after
-          value: 'HH:MM:SS'
+          value: 'HH:MM'
         -
           name: send_before
-          value: 'HH:MM:SS'
+          value: 'HH:MM'
         -
           name: access_token
           value: '<PLACE ACCESS TOKEN>'
         -
-          name: responsetype
-          value: 'text'
+          name: type
+          value: 'sms'
+        -
+          name: duration
+          value: '10'
+        -
+          name: voice_id
+          value: '0'
         -
           name: test
           value: 'false'
       script: |
         var SMSEagle = {
             params: [],
+            requestBody: {},
 
             addParam: function (name, value) {
-                SMSEagle.params.push(name + '=' + encodeURIComponent(value));
+                SMSEagle.requestBody[name] = value;
             },
 
             setProxy: function (HTTPProxy) {
@@ -66,55 +73,82 @@ zabbix_export:
                         modem_no: 'default',
                         oid: 'default',
                         date: 'YYYYmmDDHHMM',
-                        send_before: 'HH:MM:SS',
-                        send_after: 'HH:MM:SS',
-                        unicode: '0',
-                        responsetype: 'text',
-                        highpriority: '0',
+                        send_before: 'HH:MM',
+                        send_after: 'HH:MM',
+                        encoding: 'default',
+                        voice_id: '0',
+                        priority: '0',
                         test: 'false'
                     }
 
-                Object.keys(params)
-                    .forEach(function (key) {
+                Object.keys(params).forEach(function (key) {
                     if (params[key] && params[key] !== "" && params[key].trim() && params[key] !== defaultValues[key]) {
+                        if (key === 'flash' || key === 'test') {
+                            params[key] = (params[key] === 'true');
+                        }
+
+                        if (key === 'priority' || key === 'duration' || key === 'voice_id') {
+                            params[key] = parseInt(params[key]);
+                        }
+
+                        if (key === 'recipient' || key === 'text') {
+                            params[key] = encodeURIComponent(params[key]);
+                        }
+
                         SMSEagle.addParam(key, params[key]);
-                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + key + ": " + params[key]);
+                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + key + ": " + SMSEagle.requestBody[key]);
                     }
                 });
 
+                var recipientType = '';
                 if (parts[1] === 'g') {
-                    params.url = params.url + '/http_api/send_togroup';
-                    SMSEagle.addParam('groupname', parts[0]);
+                    recipientType = 'groups';
                 } else if (parts[1] === 'c') {
-                    params.url = params.url + '/http_api/send_tocontact';
-                    SMSEagle.addParam('contactname', parts[0]);
+                    recipientType = 'contacts';
                 } else {
-                    params.url = params.url + '/http_api/send_sms';
-                    SMSEagle.addParam('to', parts[0]);
+                    recipientType = 'to';
                 }
+
+                var recipient = [parts[0]];
+                SMSEagle.addParam(recipientType, recipient);
 
                 delete params.recipient;
             },
 
-            request: function () {
-                var response,
-                    request = new HttpRequest(),
-                    data = '?' + SMSEagle.params.join('&');
+            request: function (element) {
+                var dest_url;
 
-                request.addHeader('Content-Type: multipart/form-data');
+                switch (element) {
+                    case 'tts':
+                        dest_url = params.url + '/api/v2/calls/tts';
+                        break;
+                    case 'tts_adv':
+                        dest_url = params.url + '/api/v2/calls/tts_advanced';
+                        break;
+                    case 'sms':
+                        dest_url = params.url + '/api/v2/messages/sms';
+                        break;
+                    case 'mms':
+                        dest_url = params.url + '/api/v2/messages/mms';
+                        break;
+                    default:
+                        dest_url = params.url + '/api/v2/messages/sms';
+                        break;
+                }
+
+                body = JSON.stringify(SMSEagle.requestBody);
 
                 if (typeof SMSEagle.HTTPProxy !== 'undefined' && SMSEagle.HTTPProxy !== '') {
                     request.setProxy(SMSEagle.HTTPProxy);
                 }
 
-                request_url = params.url + data;
+                Zabbix.log(4, '[ SMSEagle Webhook ] Sending request: ' + dest_url);
 
-                Zabbix.log(4, '[ SMSEagle Webhook ] Sending request: ' + request_url);
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('access-token: ' + params.access_token);
+                response = request.post(dest_url, body);
 
-                response = request.get(request_url);
-
-                Zabbix.log(4, '[ SMSEagle Webhook ] Received response with status code ' +
-                    request.getStatus() + '\n' + response);
+                Zabbix.log(4, '[ SMSEagle Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
 
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
                     var message = 'Request failed with status code ' + request.getStatus();
@@ -129,14 +163,23 @@ zabbix_export:
         };
 
         try {
-            var params = JSON.parse(value);
+            var response,
+                request,
+                params = JSON.parse(value),
+                body;
 
-            ['url', 'access_token', 'message', 'recipient'].forEach(function (field) {
+            ['url', 'access_token', 'text', 'recipient'].forEach(function (field) {
                 if (typeof params !== 'object' || typeof params[field] === 'undefined'
                     || !params[field].trim()) {
                     throw 'Required parameter is not set: "' + field + '".';
                 }
             });
+
+            if (params.type.includes('tts_adv')) {
+                if (typeof params !== 'object' || typeof params['voice_id'] === 'undefined' || !params['voice_id'].trim()) {
+                    throw 'Required parameter is not set: "voice_id".';
+                }
+            }
 
             if (params.recipient === '{ALERT.SENDTO}') {
                 throw 'Required parameter is not set: "recipient".';
@@ -150,9 +193,15 @@ zabbix_export:
                 throw 'Required parameter is not set: "url".';
             }
 
-            SMSEagle.setProxy(params.HTTPProxy);
+            params.type = params.type.trim();
+            var types = params.type.split(",");
+
             SMSEagle.setPayload(params);
-            SMSEagle.request();
+            types.forEach(function (element) {
+                request = new HttpRequest();
+                SMSEagle.setProxy(params.HTTPProxy);
+                SMSEagle.request(element);
+            });
 
             return 'OK';
         }
