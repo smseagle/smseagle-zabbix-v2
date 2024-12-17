@@ -67,7 +67,7 @@ zabbix_export:
             },
 
             setPayload: function (params) {
-                var parts = params.recipient.split(':'),
+                
                     defaultValues = {
                         flash: 'false',
                         modem_no: 'default',
@@ -91,7 +91,7 @@ zabbix_export:
                             params[key] = parseInt(params[key]);
                         }
 
-                        if (key === 'recipient' || key === 'text') {
+                        if (key === 'text') {
                             params[key] = encodeURIComponent(params[key]);
                         }
 
@@ -100,17 +100,33 @@ zabbix_export:
                     }
                 });
 
-                var recipientType = '';
-                if (parts[1] === 'g') {
-                    recipientType = 'groups';
-                } else if (parts[1] === 'c') {
-                    recipientType = 'contacts';
-                } else {
-                    recipientType = 'to';
-                }
-
-                var recipient = [parts[0]];
-                SMSEagle.addParam(recipientType, recipient);
+                var parts = params.recipient.split(',');
+        
+                var recipientGroups = [];
+                var recipientNumbers = [];
+                var recipientContacts = [];
+        
+                var recipientSplit = null;
+        
+                parts.forEach(function (value) {
+                    recipientSplit = value.split(':');
+        
+                    var recipientType = '';
+                    if (recipientSplit[1] === 'g') {
+                        recipientGroups.push(parseInt(recipientSplit[0]));
+                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'groups' + ": " + parseInt(recipientSplit[0]));
+                    } else if (recipientSplit[1] === 'c') {
+                        recipientContacts.push(parseInt(recipientSplit[0]));
+                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'contacts' + ": " + parseInt(recipientSplit[0]));
+                    } else {
+                        recipientNumbers.push(recipientSplit[0]);
+                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'to' + ": " + encodeURIComponent(recipientSplit[0]));
+                    }
+        
+                    SMSEagle.addParam('groups', recipientGroups);
+                    SMSEagle.addParam('contacts', recipientContacts);
+                    SMSEagle.addParam('to', recipientNumbers);
+                });
 
                 delete params.recipient;
             },

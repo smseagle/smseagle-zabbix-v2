@@ -39,6 +39,8 @@ Phone number: <code>phone_number</code><br>
 Contact in SMSEagle Phonebook: <code>contact_name:c</code><br>
 Group in SMSEagle Phonebook: <code>group_name:g</code><br>
 
+Multiple recipients can be separated by comma.
+
 
 <br/><br/>
 For more information, please see [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [SMSEagle](https://www.smseagle.eu/integration-plugins/zabbix-sms-integration/) documentation.
