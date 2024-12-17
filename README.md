@@ -4,11 +4,16 @@ This guide describes how to integrate your Zabbix installation with SMSEagle har
 <br/><br/>
 ## In SMSEagle
 
-1\. Create a new user in SMSEagle.
+1\. Create a new user in SMSEagle (menu **Users** > **+ Add Users**, user access level: “User”).
 
-2\. Grant API access to the created user.
+2\. Grant API access to the created user:
 
-3\. Enable API Access token. Generate new token.
+- Click **Access to API** beside the newly created user.
+- Enable **APIv2**
+- Generate new token
+- For text messages, add access permissions in section Messages for: **Send SMS, Send MMS**.
+- For voice alerting, add access permissions in section Calls for: **Make a ring call, Make a TTS call, Make a TTS Advanced call**.
+- Save settings.
 
 <br/><br/>
 ## In Zabbix
