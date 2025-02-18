@@ -28,7 +28,7 @@ zabbix_export:
           value: 'default'
         -
           name: encoding
-          value: 'default'
+          value: 'standard'
         -
           name: date
           value: 'YYYYmmDDHHMM'
