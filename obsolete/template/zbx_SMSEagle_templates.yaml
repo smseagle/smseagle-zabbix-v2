@@ -1,0 +1,1071 @@
+zabbix_export:
+  version: '6.2'
+  date: '2023-01-11T08:42:57Z'
+  template_groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: efed620db0c94db2802e88e530171bb9
+      template: 'SMSEagle MHD-8100 SNMP'
+      name: 'SMSEagle MHD-8100 SNMP'
+      description: |
+        Template for SMSEagle MHD devices.
+        MIBs used:
+        NET-SNMP-EXTEND-MIB
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 0c9a2b1d7b5e4d0ead2634114208ac52
+          name: 'Messages - FolderInbox'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.17.70.111.108.100.101.114.73.110.98.111.120.95.84.111.116.97.108
+          key: nsExtendOutputFull.FolderInbox_Total
+          history: 30d
+          description: 'Obtain the total amount of Inbox messages.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 014617161e414249bb9a7206f6caf1be
+          name: 'Messages - FolderOutbox'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.18.70.111.108.100.101.114.79.117.116.98.111.120.95.84.111.116.97.108
+          key: nsExtendOutputFull.FolderOutbox_Total
+          history: 30d
+          description: 'Obtain the total amount of Outbox messages.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 70f65d6146c74db19395a3d150e2f6ee
+          name: 'Messages - FolderSent_Last1Month'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.17.70.111.108.100.101.114.83.101.110.116.95.76.97.115.116.49.77
+          key: nsExtendOutputFull.FolderSent_Last1M
+          delay: 1d
+          history: 30d
+          description: 'Obtain the total amount of SentItems messages sent in the last 1 month period.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 079a6b16609b4b20b7419ab9bf41e35a
+          name: 'Messages - FolderSent_Last24Hours'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.18.70.111.108.100.101.114.83.101.110.116.95.76.97.115.116.50.52.72
+          key: nsExtendOutputFull.FolderSent_Last24H
+          delay: 5m
+          history: 30d
+          description: 'Obtain the total amount of SentItems messages sent in the last 24 hours period.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: d9f2e4e4b24b436f91e11f27cc78eafc
+          name: 'Messages - FolderSent_Last24HoursSendErrors'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.25.70.111.108.100.101.114.83.101.110.116.95.76.97.115.116.50.52.72.83.101.110.100.69.114.114
+          key: nsExtendOutputFull.FolderSent_Last24HSendErr
+          history: 30d
+          description: 'Obtain the total amount of SentItemsErr folder - messages sent with errors in the last 24 hours period.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 648976bf52494fb78c1610d168b0f5ad
+          name: 'Modem #1 Network Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.12.71.83.77.95.78.101.116.78.97.109.101.49
+          key: nsExtendOutputFull.GSM_NetName1
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Status
+        -
+          uuid: 4410d1cf55364740b39efbdf44a83139
+          name: 'Modem #2 Network Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.12.71.83.77.95.78.101.116.78.97.109.101.50
+          key: nsExtendOutputFull.GSM_NetName2
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Status
+        -
+          uuid: 2f93c41617424ec387ffcf9c8e481dd3
+          name: 'Modem #3 Network Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.12.71.83.77.95.78.101.116.78.97.109.101.51
+          key: nsExtendOutputFull.GSM_NetName3
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Status
+        -
+          uuid: fbf0e8f44e32460691dcc6fd33335ad5
+          name: 'Modem #4 Network Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.12.71.83.77.95.78.101.116.78.97.109.101.52
+          key: nsExtendOutputFull.GSM_NetName4
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Status
+        -
+          uuid: 73425e1442a94c7284609cac302e984b
+          name: 'Modem #5 Network Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.12.71.83.77.95.78.101.116.78.97.109.101.53
+          key: nsExtendOutputFull.GSM_NetName5
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Status
+        -
+          uuid: 8e49512bd3714d77b2ac48cfd5f069db
+          name: 'Modem #6 Network Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.12.71.83.77.95.78.101.116.78.97.109.101.54
+          key: nsExtendOutputFull.GSM_NetName6
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Status
+        -
+          uuid: c9215a815da7466b98ffd3dcfe02c940
+          name: 'Modem #7 Network Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.12.71.83.77.95.78.101.116.78.97.109.101.55
+          key: nsExtendOutputFull.GSM_NetName7
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Status
+        -
+          uuid: acf943509ed146869f55806facb09bcd
+          name: 'Modem #8 Network Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.12.71.83.77.95.78.101.116.78.97.109.101.56
+          key: nsExtendOutputFull.GSM_NetName8
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Status
+        -
+          uuid: 30579bc214b64e05a9761a645f643987
+          name: 'Modem #1 Signal Strength'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.11.71.83.77.95.83.105.103.110.97.108.49
+          key: nsExtendOutputFull.GSM_Signal1
+          history: 30d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: d128df4cd777409580cf7710fe724ae2
+              expression: 'last(/SMSEagle MHD-8100 SNMP/nsExtendOutputFull.GSM_Signal1)<10'
+              name: 'Modem #1 signal strength low'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          uuid: 12d561cb87d34130934f2643b4d3183c
+          name: 'Modem #2 Signal Strength'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.11.71.83.77.95.83.105.103.110.97.108.50
+          key: nsExtendOutputFull.GSM_Signal2
+          history: 30d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: c4914355ffaf4168962170e3d15e79cd
+              expression: 'last(/SMSEagle MHD-8100 SNMP/nsExtendOutputFull.GSM_Signal2)<10'
+              name: 'Modem #2 signal strength low'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          uuid: 19650260f97a42b597e7bc0f6f1f5e3e
+          name: 'Modem #3 Signal Strength'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.11.71.83.77.95.83.105.103.110.97.108.51
+          key: nsExtendOutputFull.GSM_Signal3
+          history: 30d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 790486111e8f4a9baf9befcc6ac94f59
+              expression: 'last(/SMSEagle MHD-8100 SNMP/nsExtendOutputFull.GSM_Signal3)<10'
+              name: 'Modem #3 signal strength low'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          uuid: 2353247893a44df89f4c203a0ea12bc5
+          name: 'Modem #4 Signal Strength'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.11.71.83.77.95.83.105.103.110.97.108.52
+          key: nsExtendOutputFull.GSM_Signal4
+          history: 30d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: f8e970bb23624077956886ff88f8573a
+              expression: 'last(/SMSEagle MHD-8100 SNMP/nsExtendOutputFull.GSM_Signal4)<10'
+              name: 'Modem #4 signal strength low'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          uuid: 1ac7d9b0dd36458e9931bb8c562963d2
+          name: 'Modem #5 Signal Strength'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.11.71.83.77.95.83.105.103.110.97.108.53
+          key: nsExtendOutputFull.GSM_Signal5
+          history: 30d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 5c6657e4df85475fa42aeb03be4bb624
+              expression: 'last(/SMSEagle MHD-8100 SNMP/nsExtendOutputFull.GSM_Signal5)<10'
+              name: 'Modem #5 signal strength low'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          uuid: d6982140d0844343950a121219982713
+          name: 'Modem #6 Signal Strength'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.11.71.83.77.95.83.105.103.110.97.108.54
+          key: nsExtendOutputFull.GSM_Signal6
+          history: 30d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: eddc39dfc2934eeeacdc452d9334b765
+              expression: 'last(/SMSEagle MHD-8100 SNMP/nsExtendOutputFull.GSM_Signal6)<10'
+              name: 'Modem #6 signal strength low'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          uuid: 2e5bf505b22f4a909d50699ab24fe5ff
+          name: 'Modem #7 Signal Strength'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.11.71.83.77.95.83.105.103.110.97.108.55
+          key: nsExtendOutputFull.GSM_Signal7
+          history: 30d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 0d469ed6056e4cf8b69d8a8039274c77
+              expression: 'last(/SMSEagle MHD-8100 SNMP/nsExtendOutputFull.GSM_Signal7)<10'
+              name: 'Modem #7 signal strength low'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          uuid: 8a8db10533cc46f7b05260bd5053ecaa
+          name: 'Modem #8 Signal Strength'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.11.71.83.77.95.83.105.103.110.97.108.56
+          key: nsExtendOutputFull.GSM_Signal8
+          history: 30d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 1560f26c82ef4a9eb1f098363bbdbcf2
+              expression: 'last(/SMSEagle MHD-8100 SNMP/nsExtendOutputFull.GSM_Signal8)<10'
+              name: 'Modem #8 signal strength low'
+              priority: AVERAGE
+              manual_close: 'YES'
+      macros:
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 1m
+        -
+          macro: '{$SNMP_COMMUNITY}'
+          value: public
+          description: 'Default SMSEagle community name'
+    -
+      uuid: 5acc022f5efe4d10a4ede88bdba18c2a
+      template: 'SMSEagle NXS-9700 SNMP'
+      name: 'SMSEagle NXS-9700 SNMP'
+      description: |
+        Template for SMSEagle NXS-9700 (single modem) devices.
+        MIBs used:
+        NET-SNMP-EXTEND-MIB
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 7233120643f842bda4c3faa80719a8f4
+          name: 'Messages - FolderInbox'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.17.70.111.108.100.101.114.73.110.98.111.120.95.84.111.116.97.108
+          key: nsExtendOutputFull.FolderInbox_Total
+          history: 30d
+          description: 'Obtain the total amount of Inbox messages.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 5cfcd597c89c47f9b1675916a796ad00
+          name: 'Messages - FolderOutbox'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.18.70.111.108.100.101.114.79.117.116.98.111.120.95.84.111.116.97.108
+          key: nsExtendOutputFull.FolderOutbox_Total
+          history: 30d
+          description: 'Obtain the total amount of Outbox messages.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 38dddeb3ca894238a49104159da597cb
+          name: 'Messages - FolderSent_Last1Month'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.17.70.111.108.100.101.114.83.101.110.116.95.76.97.115.116.49.77
+          key: nsExtendOutputFull.FolderSent_Last1M
+          delay: 1d
+          history: 30d
+          description: 'Obtain the total amount of SentItems messages sent in the last 1 month period.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 78195531af32451493ea2fa320ee4fdc
+          name: 'Messages - FolderSent_Last24Hours'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.18.70.111.108.100.101.114.83.101.110.116.95.76.97.115.116.50.52.72
+          key: nsExtendOutputFull.FolderSent_Last24H
+          delay: 5m
+          history: 30d
+          description: 'Obtain the total amount of SentItems messages sent in the last 24 hours period.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: def09a7c64704f14b132927335b44f97
+          name: 'Messages - FolderSent_Last24HoursSendErrors'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.25.70.111.108.100.101.114.83.101.110.116.95.76.97.115.116.50.52.72.83.101.110.100.69.114.114
+          key: nsExtendOutputFull.FolderSent_Last24HSendErr
+          history: 30d
+          description: 'Obtain the total amount of SentItemsErr folder - messages sent with errors in the last 24 hours period.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 96dd166b3859419b82f951bd110142e4
+          name: 'Modem #1 Network Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.12.71.83.77.95.78.101.116.78.97.109.101.49
+          key: nsExtendOutputFull.GSM_NetName1
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Status
+        -
+          uuid: f202cb5a395041b68e11f8435126fc70
+          name: 'Modem #1 Signal Strength'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.11.71.83.77.95.83.105.103.110.97.108.49
+          key: nsExtendOutputFull.GSM_Signal1
+          history: 30d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: 0563c9da7fa8437b8da78f28be91717f
+              expression: 'last(/SMSEagle NXS-9700 SNMP/nsExtendOutputFull.GSM_Signal1)<10'
+              name: 'Modem #1 signal strength low'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          uuid: 13cb57f0048a4119800118bb98a4bbc5
+          name: 'Sensor internal - humidity'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.8.72.117.109.105.100.105.116.121
+          key: nsExtendOutputFull.Humidity
+          delay: 5m
+          history: 30d
+          value_type: FLOAT
+          description: 'SNMP Monitoring for Internal DHT sensor (id=1) - get humidity value in percent.'
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 24ed860f903f499ab9d5b30c26d19a03
+          name: 'Sensor internal - temperature'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.5.84.101.109.112.49
+          key: nsExtendOutputFull.Temp1
+          delay: 5m
+          history: 30d
+          value_type: FLOAT
+          description: |
+            SNMP Monitoring for Internal DHT sensor (id=1) - get temp value in Celcius.
+            Legacy OID, just for compatibility.
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 4414365e74d94a9db1df9af2750ce785
+          name: 'Sensor external #1 - temperature'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.5.84.101.109.112.50
+          key: nsExtendOutputFull.Temp2
+          delay: 5m
+          history: 30d
+          value_type: FLOAT
+          description: 'SNMP Monitoring for external temp sensor (id=2) - get temp value in Celcius.'
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: ecdaf65c89ea4e0daaa9f453217fd5a6
+          name: 'Sensor external #2 - temperature'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.5.84.101.109.112.51
+          key: nsExtendOutputFull.Temp3
+          delay: 5m
+          history: 30d
+          value_type: FLOAT
+          description: 'SNMP Monitoring for external temp sensor (id=3) - get temp value'
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: f97215da6be54a6aa0b23613f025ec73
+          name: 'Sensor external #3 - temperature'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.5.84.101.109.112.52
+          key: nsExtendOutputFull.Temp4
+          delay: 5m
+          history: 30d
+          value_type: FLOAT
+          description: 'SNMP Monitoring for external temp sensor (id=4) - get temp value'
+          tags:
+            -
+              tag: Application
+              value: Inventory
+      macros:
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 1m
+        -
+          macro: '{$SNMP_COMMUNITY}'
+          value: public
+          description: 'Default SMSEagle community name'
+    -
+      uuid: 3e47308c67b54c0c93268cfaaae271e5
+      template: 'SMSEagle NXS-9750 SNMP'
+      name: 'SMSEagle NXS-9750 SNMP'
+      description: |
+        Template for SMSEagle NXS-9750 (dual modem) devices.
+        MIBs used:
+        NET-SNMP-EXTEND-MIB
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 4e1be3a89f3c49028e4248185b653955
+          name: 'Messages - FolderInbox'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.17.70.111.108.100.101.114.73.110.98.111.120.95.84.111.116.97.108
+          key: nsExtendOutputFull.FolderInbox_Total
+          history: 30d
+          description: 'Obtain the total amount of Inbox messages.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: efc3965760984a69a4c068c77a742586
+          name: 'Messages - FolderOutbox'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.18.70.111.108.100.101.114.79.117.116.98.111.120.95.84.111.116.97.108
+          key: nsExtendOutputFull.FolderOutbox_Total
+          history: 30d
+          description: 'Obtain the total amount of Outbox messages.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: ff78932371674333857c9c666b683a20
+          name: 'Messages - FolderSent_Last1Month'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.17.70.111.108.100.101.114.83.101.110.116.95.76.97.115.116.49.77
+          key: nsExtendOutputFull.FolderSent_Last1M
+          delay: 1d
+          history: 30d
+          description: 'Obtain the total amount of SentItems messages sent in the last 1 month period.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 150dac567fc7412dbf1508f3ae32f20a
+          name: 'Messages - FolderSent_Last24Hours'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.18.70.111.108.100.101.114.83.101.110.116.95.76.97.115.116.50.52.72
+          key: nsExtendOutputFull.FolderSent_Last24H
+          delay: 5m
+          history: 30d
+          description: 'Obtain the total amount of SentItems messages sent in the last 24 hours period.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: 2c5e6a3f9bff4b5f81f7d903579e5c6a
+          name: 'Messages - FolderSent_Last24HoursSendErrors'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.25.70.111.108.100.101.114.83.101.110.116.95.76.97.115.116.50.52.72.83.101.110.100.69.114.114
+          key: nsExtendOutputFull.FolderSent_Last24HSendErr
+          history: 30d
+          description: 'Obtain the total amount of SentItemsErr folder - messages sent with errors in the last 24 hours period.'
+          tags:
+            -
+              tag: Application
+              value: General
+        -
+          uuid: acd7be5781d64c478a8914445b502a84
+          name: 'Modem #1 Network Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.12.71.83.77.95.78.101.116.78.97.109.101.49
+          key: nsExtendOutputFull.GSM_NetName1
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Status
+        -
+          uuid: 69ad251968e9492e9cf3953b7dd241d4
+          name: 'Modem #2 Network Name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.12.71.83.77.95.78.101.116.78.97.109.101.50
+          key: nsExtendOutputFull.GSM_NetName2
+          delay: 1h
+          history: 30d
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Status
+        -
+          uuid: 96b19d1a5f904090ac41fe823d636d43
+          name: 'Modem #1 Signal Strength'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.11.71.83.77.95.83.105.103.110.97.108.49
+          key: nsExtendOutputFull.GSM_Signal1
+          history: 30d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: eacb0aac394448e19f5fe75b17ab2bf6
+              expression: 'last(/SMSEagle NXS-9750 SNMP/nsExtendOutputFull.GSM_Signal1)<10'
+              name: 'Modem #1 signal strength low'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          uuid: fc68de7b060e43aebe5387f1e651df45
+          name: 'Modem #2 Signal Strength'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.11.71.83.77.95.83.105.103.110.97.108.50
+          key: nsExtendOutputFull.GSM_Signal2
+          history: 30d
+          value_type: FLOAT
+          tags:
+            -
+              tag: Application
+              value: Status
+          triggers:
+            -
+              uuid: ea7de67e86c945a2810922fde5eff10a
+              expression: 'last(/SMSEagle NXS-9750 SNMP/nsExtendOutputFull.GSM_Signal2)<10'
+              name: 'Modem #2 signal strength low'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          uuid: e685ab233fc5429a9fa89fc99236e4e5
+          name: 'Sensor internal - humidity'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.8.72.117.109.105.100.105.116.121
+          key: nsExtendOutputFull.Humidity
+          delay: 5m
+          history: 30d
+          value_type: FLOAT
+          description: 'SNMP Monitoring for Internal DHT sensor (id=1) - get humidity value in percent.'
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: d6c90d85dc534718b6d9077308f032be
+          name: 'Sensor internal - temperature'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.5.84.101.109.112.49
+          key: nsExtendOutputFull.Temp1
+          delay: 5m
+          history: 30d
+          value_type: FLOAT
+          description: |
+            SNMP Monitoring for Internal DHT sensor (id=1) - get temp value in Celcius.
+            Legacy OID, just for compatibility.
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: ffab9840be9d42a3866cf9ca5a602db1
+          name: 'Sensor external #1 - temperature'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.5.84.101.109.112.50
+          key: nsExtendOutputFull.Temp2
+          delay: 5m
+          history: 30d
+          value_type: FLOAT
+          description: 'SNMP Monitoring for external temp sensor (id=2) - get temp value in Celcius.'
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 3b7a6cb8ff074c3eb84bc580db04f090
+          name: 'Sensor external #2 - temperature'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.5.84.101.109.112.51
+          key: nsExtendOutputFull.Temp3
+          delay: 5m
+          history: 30d
+          value_type: FLOAT
+          description: 'SNMP Monitoring for external temp sensor (id=3) - get temp value'
+          tags:
+            -
+              tag: Application
+              value: Inventory
+        -
+          uuid: 4d9d87e4249b4843a89c894e381b449c
+          name: 'Sensor external #3 - temperature'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.5.84.101.109.112.52
+          key: nsExtendOutputFull.Temp4
+          delay: 5m
+          history: 30d
+          value_type: FLOAT
+          description: 'SNMP Monitoring for external temp sensor (id=4) - get temp value'
+          tags:
+            -
+              tag: Application
+              value: Inventory
+      macros:
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 1m
+        -
+          macro: '{$SNMP_COMMUNITY}'
+          value: public
+          description: 'Default SMSEagle community name'
+  graphs:
+    -
+      uuid: 028f04b52ff84a22be4f970cc03d26a2
+      name: 'External sensors'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9700 SNMP'
+            key: nsExtendOutputFull.Temp2
+        -
+          sortorder: '1'
+          color: '274482'
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9700 SNMP'
+            key: nsExtendOutputFull.Temp3
+        -
+          sortorder: '2'
+          color: F63100
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9700 SNMP'
+            key: nsExtendOutputFull.Temp4
+    -
+      uuid: 926d95cd734444288e4922110f73d4e3
+      name: 'External sensors'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.Temp2
+        -
+          sortorder: '1'
+          color: '274482'
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.Temp3
+        -
+          sortorder: '2'
+          color: F63100
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.Temp4
+    -
+      uuid: 5ea6e3cff6f84b5a9ddb079b78624153
+      name: 'Internal sensor'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.Temp1
+        -
+          sortorder: '1'
+          color: '274482'
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.Humidity
+    -
+      uuid: a52c757628344fbc9b6c8d1ad2e7c8c8
+      name: 'Internal sensor'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9700 SNMP'
+            key: nsExtendOutputFull.Temp1
+        -
+          sortorder: '1'
+          color: '274482'
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9700 SNMP'
+            key: nsExtendOutputFull.Humidity
+    -
+      uuid: 0d9a869e0b484ea7b2b90a6c67c93d46
+      name: 'Messages - Inbox'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9700 SNMP'
+            key: nsExtendOutputFull.FolderInbox_Total
+    -
+      uuid: fac3befc3a304c51989ad8ff028141e8
+      name: 'Messages - Inbox'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.FolderInbox_Total
+    -
+      uuid: 11b2fcbeb453487d8d5b6fde618e510f
+      name: 'Messages - Inbox'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.FolderInbox_Total
+    -
+      uuid: 3c9b263160dd4daeb2c020761682e455
+      name: 'Messages - Outbox'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.FolderOutbox_Total
+    -
+      uuid: d358ac8bc36e46e28348d3586e3aeff7
+      name: 'Messages - Outbox'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9700 SNMP'
+            key: nsExtendOutputFull.FolderOutbox_Total
+    -
+      uuid: 757953c887d0435998a472e18aa9bd5a
+      name: 'Messages - Outbox'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.FolderOutbox_Total
+    -
+      uuid: 9baee5991e3246edbe1d3fb2cc1b3cbc
+      name: 'Messages - Sent_Last1Month'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.FolderSent_Last1M
+    -
+      uuid: 0e851dfbc67d47d5923ea54a65c0c2ae
+      name: 'Messages - Sent_Last1Month'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.FolderSent_Last1M
+    -
+      uuid: 52ec5ff41fe440e3b1d1398b12938e89
+      name: 'Messages - Sent_Last1Month'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9700 SNMP'
+            key: nsExtendOutputFull.FolderSent_Last1M
+    -
+      uuid: ef66d29f77f3412f8d7090a964374e67
+      name: 'Messages - Sent_Last24Hours&Errors'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.FolderSent_Last24H
+        -
+          sortorder: '1'
+          color: FF0000
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.FolderSent_Last24HSendErr
+    -
+      uuid: 42a9a9283e9743bf8698028a4114982f
+      name: 'Messages - Sent_Last24Hours&Errors'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9700 SNMP'
+            key: nsExtendOutputFull.FolderSent_Last24H
+        -
+          sortorder: '1'
+          color: FF0000
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9700 SNMP'
+            key: nsExtendOutputFull.FolderSent_Last24HSendErr
+    -
+      uuid: 70f676623f4c4806aafdd6bcf3f34fd3
+      name: 'Messages - Sent_Last24Hours&Errors'
+      graph_items:
+        -
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.FolderSent_Last24H
+        -
+          sortorder: '1'
+          color: FF0000
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.FolderSent_Last24HSendErr
+    -
+      uuid: 2f01e8caa7cb46b4b576e749abd38ab0
+      name: 'Signal strength'
+      graph_items:
+        -
+          color: 2E7D32
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.GSM_Signal1
+        -
+          sortorder: '1'
+          color: 0080FF
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9750 SNMP'
+            key: nsExtendOutputFull.GSM_Signal2
+    -
+      uuid: 860d0e315d9a4933813b6cf92de71024
+      name: 'Signal strength'
+      graph_items:
+        -
+          color: 2E7D32
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.GSM_Signal1
+        -
+          sortorder: '1'
+          color: '274482'
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.GSM_Signal2
+        -
+          sortorder: '2'
+          color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.GSM_Signal3
+        -
+          sortorder: '3'
+          color: F63100
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.GSM_Signal4
+        -
+          sortorder: '4'
+          color: 2774A4
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.GSM_Signal5
+        -
+          sortorder: '5'
+          color: A54F10
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.GSM_Signal6
+        -
+          sortorder: '6'
+          color: FC6EA3
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.GSM_Signal7
+        -
+          sortorder: '7'
+          color: 6C59DC
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle MHD-8100 SNMP'
+            key: nsExtendOutputFull.GSM_Signal8
+    -
+      uuid: c11752c601444d4b9c28409df2da2c3a
+      name: 'Signal strength'
+      graph_items:
+        -
+          color: 2E7D32
+          calc_fnc: ALL
+          item:
+            host: 'SMSEagle NXS-9700 SNMP'
+            key: nsExtendOutputFull.GSM_Signal1
