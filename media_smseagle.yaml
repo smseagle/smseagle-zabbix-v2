@@ -1,279 +1,427 @@
 zabbix_export:
   version: '6.0'
   media_types:
-    -
-      name: SMSEagle v2
+    - name: 'SMSEagle v2'
       type: WEBHOOK
       parameters:
-        -
-          name: url
+        - name: url
           value: '<PLACE YOUR SMSEAGLE URL>'
-        -
-          name: flash
-          value: 'false'
-        -
-          name: recipient
-          value: '{ALERT.SENDTO}'
-        -
-          name: text
-          value: '{ALERT.MESSAGE}'
-        -
-          name: priority
-          value: '0'
-        -
-          name: modem_no
-          value: 'default'
-        -
-          name: oid
-          value: 'default'
-        -
-          name: encoding
-          value: 'standard'
-        -
-          name: date
-          value: 'YYYYmmDDHHMM'
-        -
-          name: send_after
-          value: 'HH:MM'
-        -
-          name: send_before
-          value: 'HH:MM'
-        -
-          name: access_token
+        - name: access_token
           value: '<PLACE ACCESS TOKEN>'
-        -
-          name: type
+        - name: recipient
+          value: '{ALERT.SENDTO}'
+        - name: text
+          value: '{ALERT.MESSAGE}'
+        - name: type
           value: 'sms'
-        -
-          name: duration
-          value: '10'
-        -
-          name: voice_id
+        - name: priority
           value: '0'
-        -
-          name: test
+        - name: modem_no
+          value: ''
+        - name: oid
+          value: ''
+        - name: date
+          value: ''
+        - name: send_after
+          value: ''
+        - name: send_before
+          value: ''
+        - name: encoding
+          value: 'standard'
+        - name: flash
           value: 'false'
+        - name: test
+          value: 'false'
+        - name: duration
+          value: '10'
+        - name: voice_id
+          value: '0'
+        - name: verify_calls
+          value: 'true'
+        - name: verify_timeout_sec
+          value: '45'
+        - name: verify_poll_sec
+          value: '3'
+        - name: call_fail_status_codes
+          value: '255'
+        - name: fail_on_pending
+          value: 'false'
+        - name: fallback_sms
+          value: 'true'
+        - name: fallback_prefix
+          value: '[VOICE CALL FAILED] '
+        - name: HTTPProxy
+          value: ''
+      # Zabbix hard limit for webhook media types is 60s.
+      # verify_timeout_sec is counted from script start; the fallback SMS must fit in the rest.
+      timeout: 60s
+      process_tags: 'YES'
+      # Retries re-run the whole script (new call + new fallback SMS).
+      # Keep attempts at 1 unless duplicates are acceptable.
+      attempts: '1'
+      # Each alert holds an alerter for up to ~45s while verifying the call.
+      # With the import default of 1 session, alerts of this media type run one
+      # after another; 3 lets them verify in parallel. Keep StartAlerters in
+      # zabbix_server.conf above this value so other media types are not starved.
+      max_sessions: '3'
+      description: |
+        SMSEagle APIv2 webhook: SMS, MMS, TTS and TTS Advanced calls.
+        For calls it polls /api/v2/calls/done until the call leaves the queue.
+        A failed call marks the alert as Failed and sends a fallback SMS to the same recipients.
+        API user permissions: Send SMS / Send MMS for messages; Make a TTS call and/or
+        Make a TTS Advanced call plus Get calls list for calls.
+        Required: url, access_token. Recipient formats: number, contact_id:c, group_id:g (comma separated).
+        type: sms, mms, tts, tts_adv (comma separated, e.g. "sms,tts").
       script: |
-        var SMSEagle = {
-            params: [],
-            requestBody: {},
-
-            addParam: function (name, value) {
-                SMSEagle.requestBody[name] = value;
-            },
-
-            setProxy: function (HTTPProxy) {
-                SMSEagle.HTTPProxy = HTTPProxy;
-            },
-
-            setPayload: function (params) {
-                
-                    defaultValues = {
-                        flash: 'false',
-                        modem_no: 'default',
-                        oid: 'default',
-                        date: 'YYYYmmDDHHMM',
-                        send_before: 'HH:MM',
-                        send_after: 'HH:MM',
-                        encoding: 'default',
-                        voice_id: '0',
-                        priority: '0',
-                        test: 'false'
-                    }
-
-                Object.keys(params).forEach(function (key) {
-                    if (params[key] && params[key] !== "" && params[key].trim() && params[key] !== defaultValues[key]) {
-                        if (key === 'flash' || key === 'test') {
-                            params[key] = (params[key] === 'true');
-                        }
-
-                        if (key === 'priority' || key === 'duration' || key === 'voice_id') {
-                            params[key] = parseInt(params[key]);
-                        }
-
-                        SMSEagle.addParam(key, params[key]);
-                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + key + ": " + SMSEagle.requestBody[key]);
-                    }
-                });
-
-                var parts = params.recipient.split(',');
-        
-                var recipientGroups = [];
-                var recipientNumbers = [];
-                var recipientContacts = [];
-        
-                var recipientSplit = null;
-        
-                parts.forEach(function (value) {
-                    recipientSplit = value.split(':');
-        
-                    var recipientType = '';
-                    if (recipientSplit[1] === 'g') {
-                        recipientGroups.push(parseInt(recipientSplit[0]));
-                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'groups' + ": " + parseInt(recipientSplit[0]));
-                    } else if (recipientSplit[1] === 'c') {
-                        recipientContacts.push(parseInt(recipientSplit[0]));
-                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'contacts' + ": " + parseInt(recipientSplit[0]));
-                    } else {
-                        recipientNumbers.push(recipientSplit[0]);
-                        Zabbix.log(4, '[ SMSEagle Webhook ] ' + 'to' + ": " + recipientSplit[0]);
-                    }
-        
-                    SMSEagle.addParam('groups', recipientGroups);
-                    SMSEagle.addParam('contacts', recipientContacts);
-                    SMSEagle.addParam('to', recipientNumbers);
-                });
-
-                delete params.recipient;
-            },
-
-            request: function (element) {
-                var dest_url;
-
-                switch (element) {
-                    case 'tts':
-                        dest_url = params.url + '/api/v2/calls/tts';
-                        break;
-                    case 'tts_adv':
-                        dest_url = params.url + '/api/v2/calls/tts_advanced';
-                        break;
-                    case 'sms':
-                        dest_url = params.url + '/api/v2/messages/sms';
-                        break;
-                    case 'mms':
-                        dest_url = params.url + '/api/v2/messages/mms';
-                        break;
-                    default:
-                        dest_url = params.url + '/api/v2/messages/sms';
-                        break;
-                }
-
-                body = JSON.stringify(SMSEagle.requestBody);
-
-                if (typeof SMSEagle.HTTPProxy !== 'undefined' && SMSEagle.HTTPProxy !== '') {
-                    request.setProxy(SMSEagle.HTTPProxy);
-                }
-
-                Zabbix.log(4, '[ SMSEagle Webhook ] Sending request: ' + dest_url);
-
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('access-token: ' + params.access_token);
-                response = request.post(dest_url, body);
-
-                Zabbix.log(4, '[ SMSEagle Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
-
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    var message = 'Request failed with status code ' + request.getStatus();
-
-                    if (response) {
-                        message += ': ' + response;
-                    }
-
-                    throw message + '. Check debug log for more information.';
-                }
-            }
+        // SMSEagle APIv2 webhook with post-submit call verification.
+        // Duktape (ES5) compatible. Target: Zabbix 6.0+, SMSEagle APIv2 (software >= 5.0).
+        var CALL_TYPES = {
+            tts:     '/api/v2/calls/tts',
+            tts_adv: '/api/v2/calls/tts_advanced'
+        };
+        var MSG_TYPES = {
+            sms: '/api/v2/messages/sms',
+            mms: '/api/v2/messages/mms'
         };
 
-        try {
-            var response,
-                request,
-                params = JSON.parse(value),
-                body;
+        // Zabbix allows at most 10 HttpRequest objects per script run, so a single
+        // object is reused for every request. Headers persist across requests.
+        var http = null;
 
-            ['url', 'access_token', 'text', 'recipient'].forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                    || !params[field].trim()) {
-                    throw 'Required parameter is not set: "' + field + '".';
-                }
-            });
-
-            if (params.type.includes('tts_adv')) {
-                if (typeof params !== 'object' || typeof params['voice_id'] === 'undefined' || !params['voice_id'].trim()) {
-                    throw 'Required parameter is not set: "voice_id".';
-                }
-            }
-
-            if (params.recipient === '{ALERT.SENDTO}') {
-                throw 'Required parameter is not set: "recipient".';
-            }
-
-            if (params.access_token === "<PLACE ACCESS TOKEN>") {
-                throw 'Required parameter is not set: "access_token".';
-            }
-
-            if (params.url === "<PLACE YOUR SMSEAGLE URL>") {
-                throw 'Required parameter is not set: "url".';
-            }
-
-            params.type = params.type.trim();
-            var types = params.type.split(",");
-
-            SMSEagle.setPayload(params);
-            types.forEach(function (element) {
-                request = new HttpRequest();
-                SMSEagle.setProxy(params.HTTPProxy);
-                SMSEagle.request(element);
-            });
-
-            return 'OK';
+        function log(level, msg) {
+            Zabbix.log(level, '[ SMSEagle Webhook ] ' + msg);
         }
-        catch (error) {
-            Zabbix.log(3, '[ SMSEagle Webhook ] ERROR: ' + error);
+
+        function isSet(v) {
+            return typeof v === 'string' && v.trim() !== '' && v.charAt(0) !== '{' && v.charAt(0) !== '<';
+        }
+
+        // Earlier versions of this media type used placeholders to mean "not set".
+        var UNSET = ['default', 'YYYYmmDDHHMM', 'HH:MM'];
+
+        function opt(v) {
+            if (!isSet(v) || UNSET.indexOf(v.trim()) !== -1) {
+                return null;
+            }
+            return v.trim();
+        }
+
+        function toBool(v) {
+            return String(v).trim().toLowerCase() === 'true';
+        }
+
+        function toInt(v, def) {
+            var n = parseInt(v, 10);
+            return isNaN(n) ? def : n;
+        }
+
+        function nowMs() {
+            return new Date().getTime();
+        }
+
+        function initHttp(params) {
+            http = new HttpRequest();
+            if (isSet(params.HTTPProxy)) {
+                http.setProxy(params.HTTPProxy);
+            }
+            http.addHeader('Content-Type: application/json');
+            http.addHeader('access-token: ' + params.access_token);
+        }
+
+        // Returns parsed JSON. For GET, allow404 maps HTTP 404 to an empty list:
+        // SMSEagle list endpoints answer 404 "Resource(s) not found" instead of [].
+        function api(params, method, path, body, allow404) {
+            var url = params.url.replace(/\/+$/, '') + path;
+            var resp;
+            log(4, method + ' ' + url + (body ? ' body=' + JSON.stringify(body) : ''));
+
+            if (method === 'POST') {
+                resp = http.post(url, JSON.stringify(body));
+            } else {
+                resp = http.get(url);
+            }
+
+            var code = http.getStatus();
+            log(4, 'HTTP ' + code + ': ' + resp);
+
+            if (code === 404 && allow404) {
+                return [];
+            }
+            if (code < 200 || code >= 300) {
+                throw method + ' ' + path + ' failed with HTTP ' + code + (resp ? ': ' + resp : '');
+            }
+
+            try {
+                return JSON.parse(resp);
+            } catch (e) {
+                throw method + ' ' + path + ' returned non-JSON response: ' + resp;
+            }
+        }
+
+        function parseRecipients(raw) {
+            var out = { to: [], contacts: [], groups: [] };
+            raw.split(',').forEach(function (part) {
+                var p = part.trim().split(':');
+                if (!p[0]) {
+                    return;
+                }
+                if (p[1] === 'g') {
+                    out.groups.push(parseInt(p[0], 10));
+                } else if (p[1] === 'c') {
+                    out.contacts.push(parseInt(p[0], 10));
+                } else {
+                    out.to.push(p[0]);
+                }
+            });
+            if (!out.to.length && !out.contacts.length && !out.groups.length) {
+                throw 'No valid recipients in "' + raw + '".';
+            }
+            return out;
+        }
+
+        function buildBody(params, type, rcpt, textOverride) {
+            // Per-endpoint body: each endpoint gets only the fields it accepts.
+            var body = {
+                to: rcpt.to,
+                contacts: rcpt.contacts,
+                groups: rcpt.groups,
+                text: textOverride || params.text
+            };
+            var prio = toInt(params.priority, 0);
+            if (prio) {
+                body.priority = prio;
+            }
+            if (opt(params.modem_no)) {
+                body.modem_no = toInt(params.modem_no, 1);
+            }
+            if (opt(params.date)) {
+                body.date = opt(params.date);
+            }
+            if (CALL_TYPES[type]) {
+                body.duration = toInt(params.duration, 10);
+                if (type === 'tts_adv') {
+                    body.voice_id = toInt(params.voice_id, 0);
+                }
+                // Call endpoints name the time window call_after / call_before.
+                if (opt(params.send_after)) {
+                    body.call_after = opt(params.send_after);
+                }
+                if (opt(params.send_before)) {
+                    body.call_before = opt(params.send_before);
+                }
+            } else {
+                if (opt(params.send_after)) {
+                    body.send_after = opt(params.send_after);
+                }
+                if (opt(params.send_before)) {
+                    body.send_before = opt(params.send_before);
+                }
+                if (opt(params.oid)) {
+                    body.oid = opt(params.oid);
+                }
+                if (toBool(params.test)) {
+                    body.test = true;
+                }
+                if (type === 'sms' && toBool(params.flash)) {
+                    body.flash = true;
+                }
+                if (opt(params.encoding) && params.encoding !== 'standard') {
+                    body.encoding = opt(params.encoding);
+                }
+            }
+            return body;
+        }
+
+        // Response: [{status: 'queued', message, id, number}] or [{status: 'REJECTED', message, number}]
+        function submit(params, type, rcpt, textOverride) {
+            var path = CALL_TYPES[type] || MSG_TYPES[type];
+            var resp = api(params, 'POST', path, buildBody(params, type, rcpt, textOverride), false);
+
+            if (!Array.isArray(resp) || !resp.length) {
+                throw type + ': unexpected response ' + JSON.stringify(resp);
+            }
+
+            var ids = [];
+            var rejected = [];
+            resp.forEach(function (r) {
+                if (r.status === 'queued' && typeof r.id === 'number') {
+                    ids.push(r.id);
+                } else {
+                    rejected.push((r.number || '?') + ': ' + (r.message || r.status));
+                }
+            });
+
+            if (rejected.length) {
+                throw type + ': not queued for ' + rejected.join('; ') + (ids.length ? ' (queued ids: ' + ids.join(',') + ')' : '');
+            }
+            return ids;
+        }
+
+        // Polls /api/v2/calls/done for all call ids at once until each one has left
+        // the queue or the deadline passes. proxcalld sets StatusCode 0 on success
+        // and 255 after max retries (no answer, busy, modem error); queued calls are -1/-2.
+        // No type filter: the id range is enough and tts_advanced filtering is unreliable.
+        function verifyCalls(params, ids, deadline) {
+            var failCodes = params.call_fail_status_codes.split(',').map(function (c) {
+                return parseInt(c.trim(), 10);
+            });
+            var idFrom = Math.min.apply(null, ids);
+            var idTo = Math.max.apply(null, ids);
+            var pollMs = Math.max(1, toInt(params.verify_poll_sec, 3)) * 1000;
+            var state = {};
+            var lastError = null;
+
+            ids.forEach(function (id) {
+                state[id] = 'pending';
+            });
+
+            while (true) {
+                try {
+                    var done = api(params, 'GET', '/api/v2/calls/done?id_from=' + idFrom + '&id_to=' + idTo, null, true);
+                    lastError = null;
+                    (Array.isArray(done) ? done : []).forEach(function (c) {
+                        var code = parseInt(c.status_code, 10);
+                        if (state.hasOwnProperty(c.id)) {
+                            state[c.id] = failCodes.indexOf(code) === -1
+                                ? 'ok'
+                                : 'failed(status_code=' + code + ',retries=' + c.retries + ')';
+                        }
+                    });
+                } catch (e) {
+                    // A transient poll error must not be reported as a failed call.
+                    lastError = String(e);
+                    log(3, 'poll error: ' + lastError);
+                }
+
+                var pending = ids.filter(function (id) { return state[id] === 'pending'; });
+                if (!pending.length || nowMs() + pollMs > deadline) {
+                    break;
+                }
+                Zabbix.sleep(pollMs);
+            }
+
+            var res = { ok: [], failed: [], pending: [], lastError: lastError };
+            ids.forEach(function (id) {
+                if (state[id] === 'ok') {
+                    res.ok.push(id);
+                } else if (state[id] === 'pending') {
+                    res.pending.push(id);
+                } else {
+                    res.failed.push(id + ':' + state[id]);
+                }
+            });
+            return res;
+        }
+
+        try {
+            var startMs = nowMs();
+            var params = JSON.parse(value);
+
+            ['url', 'access_token', 'text', 'recipient', 'type'].forEach(function (f) {
+                if (!isSet(params[f])) {
+                    throw 'Required parameter is not set: "' + f + '".';
+                }
+            });
+
+            initHttp(params);
+
+            var rcpt = parseRecipients(params.recipient);
+            var types = params.type.split(',').map(function (t) { return t.trim(); });
+            var tags = {};
+            var errors = [];
+            var voiceProblem = false;
+            var callIds = [];
+
+            // 1. Submit every requested type first, so SMS/MMS are not delayed by call verification.
+            types.forEach(function (type) {
+                if (!CALL_TYPES[type] && !MSG_TYPES[type]) {
+                    errors.push('unsupported type "' + type + '"');
+                    return;
+                }
+                try {
+                    var ids = submit(params, type, rcpt);
+                    tags['smseagle_' + type + '_ids'] = ids.join(',');
+                    if (CALL_TYPES[type]) {
+                        callIds = callIds.concat(ids);
+                    }
+                } catch (e) {
+                    // Isolate per-type failures: one broken channel must not abort the others.
+                    if (CALL_TYPES[type]) {
+                        voiceProblem = true;
+                    }
+                    errors.push(String(e));
+                }
+            });
+
+            // 2. Verify all queued calls in one polling loop.
+            if (callIds.length && toBool(params.verify_calls)) {
+                var deadline = startMs + toInt(params.verify_timeout_sec, 45) * 1000;
+                var v = verifyCalls(params, callIds, deadline);
+                tags.smseagle_call_state = v.failed.length ? 'failed' : (v.pending.length ? 'pending' : 'ok');
+
+                if (v.failed.length) {
+                    voiceProblem = true;
+                    errors.push('call failed: ' + v.failed.join(', '));
+                } else if (v.pending.length && toBool(params.fail_on_pending)) {
+                    voiceProblem = true;
+                    errors.push('call not finished within ' + params.verify_timeout_sec + 's: ' + v.pending.join(',')
+                        + (v.lastError ? ' (last poll error: ' + v.lastError + ')' : ''));
+                } else if (v.pending.length) {
+                    log(3, 'call still in progress after verify window: ' + v.pending.join(',')
+                        + (v.lastError ? ' (last poll error: ' + v.lastError + ')' : ''));
+                }
+            }
+
+            // 3. Fallback SMS only when no SMS was requested explicitly.
+            if (voiceProblem && toBool(params.fallback_sms) && types.indexOf('sms') === -1) {
+                try {
+                    var smsIds = submit(params, 'sms', rcpt, params.fallback_prefix + params.text);
+                    tags.smseagle_fallback_sms_ids = smsIds.join(',');
+                    errors.push('fallback SMS queued: ' + smsIds.join(','));
+                } catch (e) {
+                    errors.push('fallback SMS failed: ' + e);
+                }
+            }
+
+            if (errors.length) {
+                // Fail the alert so it shows as "Failed" in the Zabbix action log.
+                // Tags are lost on throw, so ids are included in the message.
+                throw errors.join(' | ') + ' | tags=' + JSON.stringify(tags);
+            }
+
+            return JSON.stringify({ tags: tags });
+        } catch (error) {
+            log(3, 'ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
-            [{EVENT.STATUS}] {EVENT.NAME}
-            Started at {EVENT.TIME} on {EVENT.DATE}
-            Host: {HOST.NAME}
-            Severity: {EVENT.SEVERITY}
+            {EVENT.SEVERITY} problem on {HOST.NAME}: {EVENT.NAME}.
+            Started at {EVENT.TIME} on {EVENT.DATE}.
             Operational data: {EVENT.OPDATA}
-            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
-            [{EVENT.STATUS}] {EVENT.NAME}
-            Resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
-            Host: {HOST.NAME}
-            Severity: {EVENT.SEVERITY}
-            Event info: {$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}
-        -
-          event_source: TRIGGERS
+            Resolved on {HOST.NAME}: {EVENT.NAME}.
+            Resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}.
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
-            [{EVENT.STATUS}] {EVENT.NAME}
-            
-            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem on {HOST.NAME}: {EVENT.NAME}.
             {EVENT.UPDATE.MESSAGE}
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
-            Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}
-            Discovery rule: {DISCOVERY.RULE.NAME}
-            
-            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
-            Device DNS: {DISCOVERY.DEVICE.DNS}
-            Device status: {DISCOVERY.DEVICE.STATUS}
-            Device uptime: {DISCOVERY.DEVICE.UPTIME}
-            
-            Device service name: {DISCOVERY.SERVICE.NAME}
-            Device service port: {DISCOVERY.SERVICE.PORT}
-            Device service status: {DISCOVERY.SERVICE.STATUS}
-            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+            Discovery: device {DISCOVERY.DEVICE.IPADDRESS} is {DISCOVERY.DEVICE.STATUS}.
+            Rule: {DISCOVERY.RULE.NAME}. Service: {DISCOVERY.SERVICE.NAME} {DISCOVERY.SERVICE.STATUS}.
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |
-            Autoregistration: {HOST.HOST}
-            Host IP: {HOST.IP}
-            Agent port: {HOST.PORT}
+            Autoregistration: host {HOST.HOST}, IP {HOST.IP}, agent port {HOST.PORT}.
