@@ -2,16 +2,16 @@
 
 This guide describes how to integrate your Zabbix installation with SMSEagle hardware SMS gateway using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 <br/><br/>
+[SMSEagle](https://www.smseagle.eu/) is an offline hardware SMS gateway. Therefore, no external connection to 3rd party system is required. All notifications are generated on-premise and sent directly to a cellular network. This solution can be used in secure (offline) installations without Internet access. SMSEagle runs on-premises, so alerts aren’t routed through third-party cloud SMS/voice providers.
+<br/><br/>
+
 ## In SMSEagle
 
-1\. Create a new user in SMSEagle (menu **Users** > **+ Add Users**, user access level: “User”).
+1\. Create a new API Key in SMSEagle (menu **Settings** > **API** > **APIv2** > **+ Create API key**, user access level: “User”).
 
-2\. Grant API access to the created user:
+2\. Fill in Key properties and add permissions:
 
-- Click **Access to API** beside the newly created user.
-- Enable **APIv2**
-- Generate new token
-- For text messages, add access permissions in section Messages for: **Send SMS, Send MMS**.
+- For text messages, add access permissions for: **Send SMS, Send MMS**.
 - For voice alerting, add access permissions in section Calls for: **Make a TTS call, Make a TTS Advanced call** and **Get calls list**. The last one is needed to check the result of each call (see [Voice call tracking](#voice-call-tracking)).
 - Save settings.
 
@@ -105,6 +105,7 @@ Changes in behaviour compared to the previous version:
 <br/><br/>
 For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.0/manual/config/notifications) and [SMSEagle](https://www.smseagle.eu/integration-plugins/zabbix-sms-integration/) documentation.
 <br/><br/>
+
 ## Supported Versions
 
 Zabbix 6.0+ (tested on 6.0 and 7.0)
