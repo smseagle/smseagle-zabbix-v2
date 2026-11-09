@@ -93,7 +93,7 @@ Import the new [media_smseagle.yaml](media_smseagle.yaml) with **Update existing
 
 Changes in behaviour compared to the previous version:
 
-- TTS calls are tracked (see [Voice call tracking](#voice-call-tracking)). An alert whose call was not completed is now marked as **Failed** and triggers a fallback SMS. Set **verify_calls** to `false` to keep the previous behaviour.
+- TTS calls are tracked (see [Voice call tracking](#voice-call-tracking)). Confirmed call failures mark the alert as **Failed** and trigger SMS fallback when enabled. Calls still pending after the verification window remain **Sent** by default; set **fail_on_pending** to `true` to treat them as failures. Set **verify_calls** to `false` to disable tracking.
 - The API user needs the **Get calls list** permission for call tracking.
 - **send_after** / **send_before** are now also applied to calls. Previously they were sent with the wrong field names and ignored for calls.
 - Each request contains only the fields its endpoint accepts. Previously all parameters, including **access_token**, were sent in the request body.
@@ -108,4 +108,4 @@ For more information, please see [Zabbix](https://www.zabbix.com/documentation/7
 
 ## Supported Versions
 
-Zabbix 6.0+ (tested on 6.0 and 7.0)
+Zabbix 6.0+ (tested on 6.0, 7.0 and 8.0.0rc2)
